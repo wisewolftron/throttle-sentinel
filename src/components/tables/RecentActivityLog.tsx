@@ -15,6 +15,28 @@ interface RecentActivityLogProps {
 }
 
 const RecentActivityLog = ({ data }: RecentActivityLogProps) => {
+  // Function to determine status badge
+  const getStatusBadge = (item: RequestData) => {
+    if (item.blocked) {
+      return <Badge variant="destructive">BLOCKED</Badge>;
+    }
+    
+    if (item.status) {
+      if (item.status >= 500) {
+        return <Badge variant="destructive">{item.status}</Badge>;
+      }
+      if (item.status >= 400) {
+        return <Badge variant="warning">{item.status}</Badge>;
+      }
+      if (item.status >= 300) {
+        return <Badge variant="secondary">{item.status}</Badge>;
+      }
+      return <Badge variant="success">{item.status}</Badge>;
+    }
+
+    return <Badge variant="success">SUCCESS</Badge>;
+  };
+
   return (
     <div className="rounded-md overflow-hidden">
       <Table>
@@ -24,6 +46,7 @@ const RecentActivityLog = ({ data }: RecentActivityLogProps) => {
             <TableHead className="text-gray-400">IP Address</TableHead>
             <TableHead className="text-gray-400">Endpoint</TableHead>
             <TableHead className="text-gray-400">Method</TableHead>
+            <TableHead className="text-gray-400">Response Time</TableHead>
             <TableHead className="text-gray-400">Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -40,11 +63,10 @@ const RecentActivityLog = ({ data }: RecentActivityLogProps) => {
               <TableCell>{item.endpoint}</TableCell>
               <TableCell>{item.method}</TableCell>
               <TableCell>
-                <Badge 
-                  variant={item.blocked ? "destructive" : "success"}
-                >
-                  {item.blocked ? "BLOCKED" : "SUCCESS"}
-                </Badge>
+                {item.responseTime ? `${item.responseTime}ms` : "-"}
+              </TableCell>
+              <TableCell>
+                {getStatusBadge(item)}
               </TableCell>
             </TableRow>
           ))}
